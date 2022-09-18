@@ -3,11 +3,6 @@ const internModel = require('../Models/internModel')
 const { default: mongoose } = require('mongoose');
 
 //================validation==============
-const isValid = function (value) {
-    if (typeof value === 'undefined' || value === null) return false
-    if (typeof value === 'string' && value.trim().length === 0) return false
-    return true
-}
 
 const isValidRequestBody = function (request) {
     return (Object.keys(request).length > 0)
@@ -24,7 +19,7 @@ const isValidNumber = function (value) {
 }
 
 const isValidname = function (value) {
-    let regex = /^[a-zA-Z]+([\s][a-zA-Z]+)*$/
+    let regex =/^[a-zA-Z]+([\s][a-zA-Z]+)*$/            
     return regex.test(value)
 }
 
@@ -41,29 +36,27 @@ const isValidCollegeName = function (value) {
 const createIntern = async function (req, res) {
     try {
         let internData = req.body
-        const queryParams = req.query
-   
-        if (isValidRequestBody(queryParams)) return res.status(400).send({ status: false, message: "invalid request" })
-
+        let queryparam = req.query
         const { name, email, mobile, collegeName } = internData
         if (!isValidRequestBody(internData)) return res.status(400).send({ status: false, message: "No input by user.." })
+        if(isValidRequestBody(queryparam)) return res.status(400).send({status:false, message: "Invalid request"})
 
-        if (!isValid(name)) return res.status(400).send({ status: false, message: "Intern's name is required." })
+        if (!name) return res.status(400).send({ status: false, message: "Intern's name is required." })
         if (!isValidname(name)) return res.status(400).send({ status: false, message: "Enter valid name i.e. fullname" })
 
-        if (!isValid(email)) return res.status(400).send({ status: false, message: "Intern's email is required." })
+        if (!email) return res.status(400).send({ status: false, message: "Intern's email is required." })
         if (!isValidEmail(email)) return res.status(400).send({ status: false, message: "Enter a valid email" })
 
         let useEmail = await internModel.findOne({ email })
-        if (useEmail) return res.status(409).send({ status: false, message: "email is already exist" })
+        if (useEmail) return res.status(400).send({ status: false, message: "email is already exist" })
 
-        if (!isValid(mobile)) return res.status(400).send({ status: false, message: "Intern's mobile is required." })
+        if (!mobile) return res.status(400).send({ status: false, message: "Intern's mobile is required." })
         if (!isValidNumber(mobile)) return res.status(400).send({ status: false, message: "Enter valid mobile" })
 
         let useMobile = await internModel.findOne({ mobile })
-        if (useMobile) return res.status(409).send({ status: false, message: "mobile is already exist" })
+        if (useMobile) return res.status(400).send({ status: false, message: "mobile is already exist" })
 
-        if (!isValid(collegeName)) return res.status(400).send({ status: false, message: "Intern's collegeName is required." })
+        if (!collegeName) return res.status(400).send({ status: false, message: "Intern's collegeName is required." })
         if (!isValidCollegeName(collegeName)) return res.status(400).send({ status: false, message: "Enter valid collegeName" })
 
         let getcollegeid = await collegeModel.findOne({ name: collegeName, isDeleted: false })
@@ -76,7 +69,7 @@ const createIntern = async function (req, res) {
         let newInterndata = await internModel.create(newIntern)
         return res.status(201).send({ status: true, message: "successfully created", data: newInterndata })
     }
-    catch (error) { return res.status(500).send({ status: false, message: error.message }) }
+    catch (error) { return res.status(500).send({status: false, message: error.message }) }
 }
 
 

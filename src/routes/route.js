@@ -14,7 +14,10 @@ router.post("/functionup/interns", internController.createIntern)
 
 router.get("/functionup/collegeDetails", collegeController.getcollegeDetails)
 
-
+router.all("/*/*", async function(req, res)
+{
+    return res.status(404).send({status: false, message: "Not found, please check url"})
+})
 
 
 
